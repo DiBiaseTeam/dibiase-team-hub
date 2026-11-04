@@ -1,0 +1,7 @@
+name = "team-onboarding-hub"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+[[kv_namespaces]]
+binding = "ONBOARDING_KV"
+id = "8afd32123e444782997b81bca69a2cad"

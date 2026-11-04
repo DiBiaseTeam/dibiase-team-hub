@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Onboarding Hub</title>
+    <style>
+        :root {
+            --bg: #f4f1ec;
+            --surface: #ffffff;
+            --surface-alt: #f9f7f3;
+            --primary: #1e3a2f;
+            --primary-light: #2d5540;
+            --accent: #4a9e72;
+            --border: #e2dcd2;
+            --text: #1a1a1a;
+            --text-muted: #72716b;
+            --text-light: #a09e97;
+            --new-color: #2563eb;
+            --new-pale: #dbeafe;
+            --exp-color: #7c3aed;
+            --exp-pale: #ede9fe;
+            --danger: #dc2626;
+            --danger-pale: #fee2e2;
+            --success: #16a34a;
+            --radius: 14px;
+            --shadow: 0 1px 8px rgba(0,0,0,0.07);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            height: 62px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        .brand { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; user-select: none; }
+        .brand-icon {
+            width: 38px; height: 38px; background: var(--primary);
+            border-radius: 10px; display: flex; align-items: center;
+            justify-content: center; color: white; font-size: 1.1rem;
+        }
+        .brand-name { font-weight: 700; font-size: 1.05rem; color: var(--primary); }
+        .header-right { display: flex; align-items: center; gap: 0.75rem; }
+
+        /* ── VIEWS ── */
+        .view { display: none; min-height: calc(100vh - 62px); }
+        .view.active { display: block; }
+
+        /* ── SAVE INDICATOR ── */
+        .save-bar {
+            position: fixed; top: 62px; left: 0; right: 0;
+            height: 3px; background: var(--accent);
+            transform: scaleX(0); transform-origin: left;
+            transition: transform 0.3s ease; z-index: 99;
+        }
+        .save-bar.active { transform: scaleX(1); }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.55rem 1.1rem; border: none; border-radius: 8px;
+            cursor: pointer; font-size: 0.875rem; font-weight: 600;
+            transition: all 0.15s; white-space: nowrap; font-family: inherit;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-light); }
+        .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+        .btn-ghost:hover { background: var(--surface-alt); color: var(--text); }
+        .btn-danger { background: var(--danger); color: white; border: none; }
+        .btn-danger:hover { opacity: 0.88; }
+        .btn-sm { padding: 0.4rem 0.85rem; font-size: 0.8rem; }
+        .btn-xs { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
+
+        /* ── BADGES ── */
+        .badge {
+            display: inline-flex; align-items: center;
+            padding: 0.2rem 0.65rem; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em;
+        }
+        .badge-new { background: var(--new-pale); color: var(--new-color); }
+        .badge-exp { background: var(--exp-pale); color: var(--exp-color); }
+
+        /* ── HOME VIEW ── */
+        .home-container { max-width: 1020px; margin: 0 auto; padding: 3rem 2rem; }
+        .home-hero { margin-bottom: 2.5rem; }
+        .home-hero h1 { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 0.4rem; }
+        .home-hero p { color: var(--text-muted); font-size: 0.95rem; }
+
+        .stats-bar { display: flex; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        .stat-pill {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 0.65rem 1.1rem;
+            font-size: 0.82rem; color: var(--text-muted); box-shadow: var(--shadow);
+        }
+        .stat-pill strong { color: var(--text); font-size: 1rem; }
+
+        .section-label {
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 1rem;
+        }
+        .agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+        .agent-card {
+            background: var(--surface); border: 1.5px solid var(--border);
+            border-radius: var(--radius); padding: 1.4rem; cursor: pointer;
+            transition: all 0.2s; box-shadow: var(--shadow);
+        }
+        .agent-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .agent-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.9rem; }
+        .avatar {
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: white; flex-shrink: 0;
+        }
+        .avatar-lg { width: 46px; height: 46px; font-size: 1rem; }
+        .avatar-md { width: 40px; height: 40px; font-size: 0.88rem; }
+        .avatar-sm { width: 34px; height: 34px; font-size: 0.78rem; }
+        .av-new { background: var(--new-color); }
+        .av-exp { background: var(--exp-color); }
+
+        .agent-name { font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem; }
+        .agent-start { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.85rem; min-height: 1.1em; }
+        .prog-label-row { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 0.4rem; }
+        .prog-label-row span:last-child { font-weight: 700; }
+        .progress-bar { height: 7px; background: var(--border); border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 10px; transition: width 0.5s ease; }
+        .pf-new { background: var(--new-color); }
+        .pf-exp { background: var(--exp-color); }
+        .pf-done { background: var(--success); }
+
+        .loading-state {
+            text-align: center; padding: 4rem 2rem; color: var(--text-muted);
+            grid-column: 1 / -1;
+        }
+        .spinner {
+            width: 32px; height: 32px; border: 3px solid var(--border);
+            border-top-color: var(--primary); border-radius: 50%;
+            animation: spin 0.8s linear infinite; margin: 0 auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .empty-state {
+            text-align: center; padding: 4rem 2rem; color: var(--text-muted);
+            background: var(--surface); border: 1.5px dashed var(--border);
+            border-radius: var(--radius); grid-column: 1 / -1;
+        }
+        .empty-icon { font-size: 2.8rem; margin-bottom: 0.9rem; opacity: 0.5; }
+        .empty-state h3 { font-size: 1rem; color: var(--text); margin-bottom: 0.4rem; font-weight: 700; }
+        .empty-state p { font-size: 0.875rem; }
+
+        /* ── AGENT DASHBOARD ── */
+        .agent-container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            background: none; border: none; cursor: pointer; color: var(--text-muted);
+            font-size: 0.875rem; font-weight: 500; padding: 0;
+            margin-bottom: 1.5rem; font-family: inherit;
+        }
+        .back-btn:hover { color: var(--text); }
+        .welcome h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.1; margin-bottom: 0.4rem; }
+        .welcome h1 em { font-style: italic; color: var(--accent); }
+        .welcome .sub { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.3rem; }
+
+        .dash-grid { display: grid; grid-template-columns: 370px 1fr; gap: 1.5rem; align-items: start; margin-top: 1.75rem; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); }
+        .card-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .card-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.4rem; line-height: 1.3; }
+        .card-desc { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.4rem; }
+
+        .circ-wrap { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.4rem; }
+        .circ-svg-wrap { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
+        .circ-svg-wrap svg { transform: rotate(-90deg); }
+        .circ-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; line-height: 1; }
+        .circ-pct { font-size: 1.3rem; font-weight: 800; display: block; }
+        .circ-word { font-size: 0.62rem; color: var(--text-muted); }
+        .circ-stats { display: flex; flex-direction: column; gap: 0.45rem; }
+        .circ-stat { display: flex; align-items: center; gap: 0.45rem; font-size: 0.84rem; color: var(--text-muted); }
+        .progress-bar-lg { height: 10px; background: var(--border); border-radius: 10px; overflow: hidden; }
+        .progress-fill-lg { height: 100%; border-radius: 10px; transition: width 0.5s ease; }
+
+        .cl-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.9rem; }
+        .cl-title { font-size: 1.05rem; font-weight: 700; }
+        .cl-count { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+        .cl-item {
+            display: flex; align-items: flex-start; gap: 0.9rem;
+            padding: 0.85rem 0; border-bottom: 1px solid var(--border);
+            cursor: pointer; border-radius: 8px; transition: background 0.1s, padding 0.1s;
+        }
+        .cl-item:last-child { border-bottom: none; }
+        .cl-item:hover { background: var(--surface-alt); padding-left: 0.6rem; padding-right: 0.6rem; margin: 0 -0.6rem; }
+        .check-circle {
+            width: 24px; height: 24px; border: 2px solid var(--border);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; margin-top: 1px; transition: all 0.2s;
+        }
+        .check-circle.done { background: var(--primary); border-color: var(--primary); }
+        .check-circle.done::after {
+            content: ''; width: 10px; height: 6px;
+            border-left: 2.5px solid white; border-bottom: 2.5px solid white;
+            transform: rotate(-45deg) translateY(-1px); display: block;
+        }
+        .cl-body { flex: 1; min-width: 0; }
+        .cl-item-title { font-weight: 600; font-size: 0.925rem; }
+        .cl-item-title.done { text-decoration: line-through; color: var(--text-muted); }
+        .cl-item-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem; line-height: 1.4; }
+        .cl-day { font-size: 0.77rem; color: var(--text-light); white-space: nowrap; padding-top: 3px; }
+
+        /* ── ADMIN VIEW ── */
+        .admin-login-wrap {
+            max-width: 400px; margin: 5rem auto;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 2.5rem; box-shadow: var(--shadow-lg); text-align: center;
+        }
+        .lock-icon { font-size: 2.5rem; margin-bottom: 0.9rem; }
+        .admin-login-wrap h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.4rem; }
+        .admin-login-wrap p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.75rem; }
+        .login-error { color: var(--danger); font-size: 0.82rem; margin-top: 0.5rem; display: none; }
+        .default-hint { margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted); }
+
+        .admin-panel { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .admin-ph { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .admin-ph h1 { font-size: 1.7rem; font-weight: 800; }
+        .admin-ph-actions { display: flex; gap: 0.75rem; }
+
+        .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; gap: 0.1rem; }
+        .tab-btn {
+            padding: 0.6rem 1.2rem; border: none; background: none; cursor: pointer;
+            font-size: 0.875rem; font-weight: 600; color: var(--text-muted);
+            border-bottom: 2.5px solid transparent; margin-bottom: -1px;
+            transition: all 0.15s; font-family: inherit; border-radius: 6px 6px 0 0;
+        }
+        .tab-btn:hover { color: var(--text); background: var(--surface-alt); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .data-table { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+        .dt-head {
+            display: grid; grid-template-columns: 2.2fr 1.3fr 1fr 2fr 150px;
+            padding: 0.75rem 1.5rem; background: var(--surface-alt);
+            border-bottom: 1px solid var(--border); font-size: 0.72rem;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted);
+        }
+        .dt-row {
+            display: grid; grid-template-columns: 2.2fr 1.3fr 1fr 2fr 150px;
+            padding: 0.9rem 1.5rem; border-bottom: 1px solid var(--border);
+            align-items: center; transition: background 0.1s;
+        }
+        .dt-row:last-child { border-bottom: none; }
+        .dt-row:hover { background: var(--surface-alt); }
+        .name-cell { display: flex; align-items: center; gap: 0.75rem; }
+        .name-cell-text strong { font-size: 0.9rem; font-weight: 600; }
+        .row-actions { display: flex; gap: 0.4rem; justify-content: flex-end; flex-wrap: wrap; }
+
+        .cl-editor { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+        .cle-head {
+            display: grid; grid-template-columns: 2fr 1.8fr 0.8fr 90px;
+            padding: 0.75rem 1.5rem; background: var(--surface-alt);
+            border-bottom: 1px solid var(--border); font-size: 0.72rem;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted);
+        }
+        .cle-row {
+            display: grid; grid-template-columns: 2fr 1.8fr 0.8fr 90px;
+            padding: 0.85rem 1.5rem; border-bottom: 1px solid var(--border);
+            align-items: center; gap: 1rem;
+        }
+        .cle-row:last-child { border-bottom: none; }
+        .cle-row:hover { background: var(--surface-alt); }
+        .cle-title { font-weight: 600; font-size: 0.88rem; }
+        .cle-desc { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.1rem; }
+
+        /* ── MODALS ── */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.42); z-index: 200;
+            align-items: center; justify-content: center; padding: 1rem;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: var(--surface); border-radius: var(--radius); padding: 2rem;
+            width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto;
+            box-shadow: var(--shadow-lg); animation: modalIn 0.2s ease;
+        }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-hd h2 { font-size: 1.15rem; font-weight: 700; }
+        .modal-close { background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--text-muted); line-height: 1; padding: 0.2rem; font-family: inherit; }
+        .modal-close:hover { color: var(--text); }
+
+        .form-group { margin-bottom: 1.1rem; }
+        .form-group label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 0.6rem 0.9rem; border: 1.5px solid var(--border);
+            border-radius: 8px; font-size: 0.9rem; font-family: inherit; outline: none;
+            transition: border-color 0.15s; background: var(--surface); color: var(--text);
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+
+        .type-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.4rem; }
+        .type-opt { border: 2px solid var(--border); border-radius: 10px; padding: 1rem; cursor: pointer; transition: all 0.15s; text-align: center; user-select: none; }
+        .type-opt:hover { border-color: var(--text-muted); }
+        .type-opt.sel-new { border-color: var(--new-color); background: var(--new-pale); }
+        .type-opt.sel-exp { border-color: var(--exp-color); background: var(--exp-pale); }
+        .type-opt .topt-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+        .type-opt .topt-name { font-size: 0.85rem; font-weight: 700; }
+        .type-opt .topt-desc { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem; }
+
+        .modal-ft { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+
+        /* ── CONFIRM ── */
+        .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; align-items: center; justify-content: center; }
+        .confirm-overlay.open { display: flex; }
+        .confirm-box { background: var(--surface); border-radius: var(--radius); padding: 2rem; max-width: 360px; width: 90%; text-align: center; box-shadow: var(--shadow-lg); animation: modalIn 0.15s ease; }
+        .confirm-box h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .confirm-box p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+        .confirm-actions { display: flex; gap: 0.75rem; justify-content: center; }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed; bottom: 1.5rem; right: 1.5rem;
+            background: var(--primary); color: white; padding: 0.75rem 1.25rem;
+            border-radius: 10px; font-size: 0.875rem; font-weight: 500;
+            z-index: 9999; opacity: 0; transform: translateY(8px);
+            transition: all 0.25s ease; pointer-events: none; max-width: 300px;
+        }
+        .toast.visible { opacity: 1; transform: translateY(0); }
+
+        .settings-card { max-width: 500px; }
+        .pw-msg { font-size: 0.82rem; margin-bottom: 0.75rem; display: none; }
+
+        @media (max-width: 800px) {
+            .dash-grid { grid-template-columns: 1fr; }
+            .dt-head, .dt-row { grid-template-columns: 1fr 1fr; }
+            .dt-head > *:nth-child(n+3), .dt-row > *:nth-child(n+3) { display: none; }
+            .cle-head, .cle-row { grid-template-columns: 1fr 90px; }
+            .cle-head > *:nth-child(n+3), .cle-row > *:nth-child(n+3):not(:last-child) { display: none; }
+        }
+        @media (max-width: 540px) {
+            .home-container, .agent-container, .admin-panel { padding: 1.25rem; }
+            .welcome h1 { font-size: 1.8rem; }
+            .header { padding: 0 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="save-bar" id="saveBar"></div>
+
+<header class="header">
+    <div class="brand" onclick="showView('home')">
+        <div class="brand-icon">🎯</div>
+        <span class="brand-name">Onboarding Hub</span>
+    </div>
+    <div class="header-right">
+        <button class="btn btn-ghost btn-sm" onclick="showAdminGate()">⚙ Admin</button>
+    </div>
+</header>
+
+<div class="toast" id="toast"></div>
+
+<div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+        <h3 id="confirmTitle">Are you sure?</h3>
+        <p id="confirmMsg">This action cannot be undone.</p>
+        <div class="confirm-actions">
+            <button class="btn btn-ghost" onclick="closeConfirm()">Cancel</button>
+            <button class="btn btn-danger" id="confirmOkBtn">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── HOME ── -->
+<div class="view active" id="view-home">
+    <div class="home-container">
+        <div class="home-hero">
+            <h1>Onboarding Hub</h1>
+            <p>Select your name to view and track your onboarding progress.</p>
+        </div>
+        <div class="stats-bar" id="statsBar"></div>
+        <div class="section-label">Your Team</div>
+        <div class="agents-grid" id="agentsGrid">
+            <div class="loading-state"><div class="spinner"></div>Loading...</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── AGENT DASHBOARD ── -->
+<div class="view" id="view-agent">
+    <div class="agent-container" id="agentContent">
+        <div class="loading-state"><div class="spinner"></div>Loading...</div>
+    </div>
+</div>
+
+<!-- ── ADMIN ── -->
+<div class="view" id="view-admin">
+    <div id="adminLoginSection">
+        <div class="admin-login-wrap">
+            <div class="lock-icon">🔒</div>
+            <h2>Admin Access</h2>
+            <p>Enter your admin password to manage agents and onboarding checklists.</p>
+            <div class="form-group" style="text-align:left">
+                <label>Password</label>
+                <input type="password" id="adminPwInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')adminLogin()">
+            </div>
+            <div class="login-error" id="loginError">Incorrect password. Try again.</div>
+            <button class="btn btn-primary" style="width:100%;margin-top:0.75rem" onclick="adminLogin()">Sign In</button>
+            <p class="default-hint">Default password: <strong>admin</strong></p>
+        </div>
+    </div>
+    <div id="adminPanelSection" style="display:none">
+        <div class="admin-panel">
+            <div class="admin-ph">
+                <h1>Admin Panel</h1>
+                <div class="admin-ph-actions">
+                    <button class="btn btn-primary" onclick="openAddAgentModal()">+ Add Agent</button>
+                    <button class="btn btn-ghost" onclick="adminLogout()">Sign Out</button>
+                </div>
+            </div>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="agents" onclick="switchTab('agents')">Agents</button>
+                <button class="tab-btn" data-tab="newCL" onclick="switchTab('newCL')">New Agent Checklist</button>
+                <button class="tab-btn" data-tab="expCL" onclick="switchTab('expCL')">Experienced Agent Checklist</button>
+                <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">Settings</button>
+            </div>
+            <div class="tab-panel active" id="tab-agents">
+                <div class="data-table" id="agentsTable"><div class="loading-state"><div class="spinner"></div>Loading...</div></div>
+            </div>
+            <div class="tab-panel" id="tab-newCL">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;">
+                    <div>
+                        <h2 style="font-size:1.05rem;font-weight:700;">New Agent Checklist</h2>
+                        <p style="font-size:0.82rem;color:var(--text-muted);margin-top:0.2rem;">Tasks for agents categorized as New Agent</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="openAddItemModal('new')">+ Add Item</button>
+                </div>
+                <div class="cl-editor" id="newCLEditor"></div>
+            </div>
+            <div class="tab-panel" id="tab-expCL">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;">
+                    <div>
+                        <h2 style="font-size:1.05rem;font-weight:700;">Experienced Agent Checklist</h2>
+                        <p style="font-size:0.82rem;color:var(--text-muted);margin-top:0.2rem;">Tasks for agents categorized as Experienced Agent</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="openAddItemModal('experienced')">+ Add Item</button>
+                </div>
+                <div class="cl-editor" id="expCLEditor"></div>
+            </div>
+            <div class="tab-panel" id="tab-settings">
+                <div class="card settings-card">
+                    <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:1.25rem;">Change Admin Password</h2>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" id="newPwInput" placeholder="Enter new password">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="confirmPwInput" placeholder="Confirm new password">
+                    </div>
+                    <div class="pw-msg" id="pwMsg"></div>
+                    <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── MODAL: Agent ── -->
+<div class="modal-overlay" id="modalAgent">
+    <div class="modal">
+        <div class="modal-hd">
+            <h2 id="modalAgentTitle">Add Agent</h2>
+            <button class="modal-close" onclick="closeModal('modalAgent')">✕</button>
+        </div>
+        <input type="hidden" id="editAgentId">
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="agentNameInput" placeholder="e.g. Sarah Johnson">
+        </div>
+        <div class="form-group">
+            <label>Agent Type</label>
+            <div class="type-selector">
+                <div class="type-opt sel-new" id="typeOptNew" onclick="selectAgentType('new')">
+                    <div class="topt-icon">🌱</div>
+                    <div class="topt-name">New Agent</div>
+                    <div class="topt-desc">First-time onboarding</div>
+                </div>
+                <div class="type-opt" id="typeOptExp" onclick="selectAgentType('experienced')">
+                    <div class="topt-icon">⭐</div>
+                    <div class="topt-name">Experienced Agent</div>
+                    <div class="topt-desc">Returning / rehire</div>
+                </div>
+            </div>
+            <input type="hidden" id="agentTypeInput" value="new">
+        </div>
+        <div class="form-group">
+            <label>Start Date</label>
+            <input type="date" id="agentStartDate">
+        </div>
+        <div id="editAgentExtra" style="display:none">
+            <div style="border-top:1px solid var(--border);padding-top:1.25rem;margin-top:0.5rem;">
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;">Danger zone</p>
+                <button class="btn btn-xs" style="color:var(--danger);border:1px solid var(--danger-pale);background:var(--danger-pale);" onclick="confirmResetProgress()">Reset Progress</button>
+            </div>
+        </div>
+        <div class="modal-ft">
+            <button class="btn btn-ghost" onclick="closeModal('modalAgent')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveAgent()">Save Agent</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── MODAL: Checklist Item ── -->
+<div class="modal-overlay" id="modalItem">
+    <div class="modal">
+        <div class="modal-hd">
+            <h2 id="modalItemTitle">Add Checklist Item</h2>
+            <button class="modal-close" onclick="closeModal('modalItem')">✕</button>
+        </div>
+        <input type="hidden" id="editItemType">
+        <input type="hidden" id="editItemId">
+        <div class="form-group">
+            <label>Task Title</label>
+            <input type="text" id="itemTitleInput" placeholder="e.g. Complete company orientation">
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="itemDescInput" placeholder="Brief description of this task..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>When (Day / Week label)</label>
+            <input type="text" id="itemDayInput" placeholder="e.g. Day 1, Week 1, Month 1">
+        </div>
+        <div class="modal-ft">
+            <button class="btn btn-ghost" onclick="closeModal('modalItem')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveItem()">Save Item</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// DATA LAYER — Cloudflare KV via Pages Function
+// ══════════════════════════════════════════════
+
+let _cache = null;
+
+async function getData() {
+    if (_cache) return _cache;
+    try {
+        const r = await fetch('/api/data');
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        _cache = await r.json();
+    } catch (e) {
+        console.error('getData:', e);
+        _cache = _cache || { adminPassword: 'admin', agents: [], checklists: { new: [], experienced: [] } };
+    }
+    return _cache;
+}
+
+async function saveData(data) {
+    _cache = data;
+    setSaveBar(true);
+    try {
+        await fetch('/api/data', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+    } catch (e) {
+        console.error('saveData:', e);
+        showToast('⚠ Could not save — check your connection');
+    } finally {
+        setSaveBar(false);
+    }
+}
+
+function setSaveBar(on) {
+    document.getElementById('saveBar').classList.toggle('active', on);
+}
+
+function invalidateCache() { _cache = null; }
+
+// Refresh data when user returns to tab
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+        invalidateCache();
+        if (currentView === 'home') renderHome();
+        else if (currentView === 'admin' && _adminLoggedIn) renderAdminAgents();
+    }
+});
+
+// ══════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════
+function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+function initials(name) { return name.trim().split(/\s+/).map(w => w[0]).join('').substring(0, 2).toUpperCase(); }
+function getProgress(agent, checklists) {
+    const list = checklists[agent.type] || [];
+    if (!list.length) return { pct: 0, done: 0, total: 0 };
+    const prog = agent.progress || {};
+    const done = list.filter(t => prog[t.id]).length;
+    return { pct: Math.round((done / list.length) * 100), done, total: list.length };
+}
+function fmtDate(ds) {
+    if (!ds) return '—';
+    const d = new Date(ds + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+function uid() { return Math.random().toString(36).slice(2, 11) + Date.now().toString(36); }
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('visible');
+    clearTimeout(t._t);
+    t._t = setTimeout(() => t.classList.remove('visible'), 2800);
+}
+function fillClass(agent, pct) {
+    if (pct === 100) return 'pf-done';
+    return agent.type === 'new' ? 'pf-new' : 'pf-exp';
+}
+function fillColor(agent, pct) {
+    if (pct === 100) return '#16a34a';
+    return agent.type === 'new' ? '#2563eb' : '#7c3aed';
+}
+
+// ══════════════════════════════════════════════
+// VIEW ROUTER
+// ══════════════════════════════════════════════
+let currentView = 'home';
+
+async function showView(name, arg) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    currentView = name;
+    window.scrollTo(0, 0);
+    if (name === 'home') await renderHome();
+    if (name === 'agent' && arg) await renderAgent(arg);
+    if (name === 'admin') await renderAdminView();
+}
+
+// ══════════════════════════════════════════════
+// HOME
+// ══════════════════════════════════════════════
+async function renderHome() {
+    const d = await getData();
+    const agents = d.agents || [];
+
+    const statsBar = document.getElementById('statsBar');
+    if (agents.length) {
+        const newCount = agents.filter(a => a.type === 'new').length;
+        const expCount = agents.filter(a => a.type === 'experienced').length;
+        const avgPct = Math.round(agents.reduce((s, a) => s + getProgress(a, d.checklists).pct, 0) / agents.length);
+        const complete = agents.filter(a => getProgress(a, d.checklists).pct === 100).length;
+        statsBar.innerHTML =
+            '<div class="stat-pill"><strong>' + agents.length + '</strong> Total Agents</div>' +
+            '<div class="stat-pill"><strong>' + newCount + '</strong> New Agents</div>' +
+            '<div class="stat-pill"><strong>' + expCount + '</strong> Experienced Agents</div>' +
+            '<div class="stat-pill"><strong>' + avgPct + '%</strong> Avg. Progress</div>' +
+            '<div class="stat-pill"><strong>' + complete + '</strong> Fully Complete</div>';
+    } else {
+        statsBar.innerHTML = '';
+    }
+
+    const grid = document.getElementById('agentsGrid');
+    if (!agents.length) {
+        grid.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><h3>No agents added yet</h3><p>An admin needs to add agents before they appear here.</p></div>';
+        return;
+    }
+
+    grid.innerHTML = agents.map(function(agent) {
+        const p = getProgress(agent, d.checklists);
+        const avCls = agent.type === 'new' ? 'av-new' : 'av-exp';
+        const bdg = agent.type === 'new'
+            ? '<span class="badge badge-new">New Agent</span>'
+            : '<span class="badge badge-exp">Experienced Agent</span>';
+        const fc = fillClass(agent, p.pct);
+        const startText = agent.startDate ? 'Started ' + fmtDate(agent.startDate) : '&nbsp;';
+        return '<div class="agent-card" onclick="showView(\'agent\',\'' + agent.id + '\')">' +
+            '<div class="agent-card-top">' +
+                '<div class="avatar avatar-lg ' + avCls + '">' + esc(initials(agent.name)) + '</div>' +
+                bdg +
+            '</div>' +
+            '<div class="agent-name">' + esc(agent.name) + '</div>' +
+            '<div class="agent-start">' + startText + '</div>' +
+            '<div class="prog-label-row"><span>' + p.done + ' of ' + p.total + ' complete</span><span>' + p.pct + '%</span></div>' +
+            '<div class="progress-bar"><div class="progress-fill ' + fc + '" style="width:' + p.pct + '%"></div></div>' +
+            '</div>';
+    }).join('');
+}
+
+// ══════════════════════════════════════════════
+// AGENT DASHBOARD
+// ══════════════════════════════════════════════
+async function renderAgent(agentId) {
+    const content = document.getElementById('agentContent');
+    content.innerHTML = '<div class="loading-state"><div class="spinner"></div>Loading...</div>';
+    const d = await getData();
+    const agent = d.agents.find(function(a) { return a.id === agentId; });
+    if (!agent) { showView('home'); return; }
+
+    const cl = d.checklists[agent.type] || [];
+    const p = getProgress(agent, d.checklists);
+    const remaining = p.total - p.done;
+    const avCls = agent.type === 'new' ? 'av-new' : 'av-exp';
+    const bdg = agent.type === 'new'
+        ? '<span class="badge badge-new">🌱 New Agent</span>'
+        : '<span class="badge badge-exp">⭐ Experienced Agent</span>';
+
+    const C = 2 * Math.PI * 42;
+    const offset = (C * (1 - p.pct / 100)).toFixed(1);
+    const color = fillColor(agent, p.pct);
+    const fc = fillClass(agent, p.pct);
+
+    var msg = 'Ready to begin your onboarding journey!';
+    if (p.pct >= 1 && p.pct < 25) msg = "You're off to a great start!";
+    else if (p.pct >= 25 && p.pct < 50) msg = 'Keep up the great momentum!';
+    else if (p.pct >= 50 && p.pct < 75) msg = "You're making excellent progress!";
+    else if (p.pct >= 75 && p.pct < 100) msg = 'Almost there — finish strong!';
+    else if (p.pct === 100) msg = '🎉 Onboarding complete! Great work!';
+
+    const desc = remaining > 0
+        ? 'Complete the essentials first. ' + remaining + ' task' + (remaining !== 1 ? 's' : '') + ' remaining.'
+        : "You've completed all onboarding tasks. Welcome to the team!";
+
+    var clHtml = '';
+    if (cl.length === 0) {
+        clHtml = '<div style="padding:2rem;text-align:center;color:var(--text-muted)">No checklist items yet.</div>';
+    } else {
+        cl.forEach(function(item) {
+            const isDone = agent.progress && agent.progress[item.id];
+            clHtml +=
+                '<div class="cl-item" onclick="toggleTask(\'' + agentId + '\',\'' + item.id + '\')">' +
+                    '<div class="check-circle ' + (isDone ? 'done' : '') + '"></div>' +
+                    '<div class="cl-body">' +
+                        '<div class="cl-item-title ' + (isDone ? 'done' : '') + '">' + esc(item.title) + '</div>' +
+                        (item.description ? '<div class="cl-item-desc">' + esc(item.description) + '</div>' : '') +
+                    '</div>' +
+                    '<div class="cl-day">' + esc(item.day || '') + '</div>' +
+                '</div>';
+        });
+    }
+
+    const firstName = esc(agent.name.trim().split(' ')[0]);
+    const startInfo = agent.startDate ? 'Started ' + fmtDate(agent.startDate) + ' · ' : '';
+
+    content.innerHTML =
+        '<button class="back-btn" onclick="showView(\'home\')">← Back</button>' +
+        '<div class="welcome">' +
+            '<div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:0.5rem;">' +
+                '<div class="avatar avatar-md ' + avCls + '" style="width:52px;height:52px;font-size:1.05rem">' + esc(initials(agent.name)) + '</div>' +
+                '<div><h1>Welcome, <em>' + firstName + '</em></h1><div style="margin-top:0.3rem">' + bdg + '</div></div>' +
+            '</div>' +
+            '<p class="sub">' + startInfo + 'Track and complete your onboarding checklist below.</p>' +
+        '</div>' +
+        '<div class="dash-grid">' +
+            '<div><div class="card">' +
+                '<div class="card-label">Current Progress</div>' +
+                '<div class="card-title">' + msg + '</div>' +
+                '<div class="card-desc">' + desc + '</div>' +
+                '<div class="circ-wrap">' +
+                    '<div class="circ-svg-wrap">' +
+                        '<svg width="100" height="100" viewBox="0 0 100 100">' +
+                            '<circle cx="50" cy="50" r="42" fill="none" stroke="var(--border)" stroke-width="9"/>' +
+                            '<circle cx="50" cy="50" r="42" fill="none" stroke="' + color + '" stroke-width="9" stroke-linecap="round" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + offset + '"/>' +
+                        '</svg>' +
+                        '<div class="circ-label">' +
+                            '<span class="circ-pct">' + p.pct + '%</span>' +
+                            '<span class="circ-word">complete</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="circ-stats">' +
+                        '<div class="circ-stat">✓ <span>' + p.done + ' of ' + p.total + ' complete</span></div>' +
+                        '<div class="circ-stat">⏱ <span>' + remaining + ' remaining</span></div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="progress-bar-lg"><div class="progress-fill-lg ' + fc + '" style="width:' + p.pct + '%"></div></div>' +
+            '</div></div>' +
+            '<div><div class="card">' +
+                '<div class="cl-header">' +
+                    '<span class="cl-title">Your onboarding checklist</span>' +
+                    '<span class="cl-count">' + p.done + '/' + p.total + ' done</span>' +
+                '</div>' +
+                clHtml +
+            '</div></div>' +
+        '</div>';
+
+    window._agentId = agentId;
+}
+
+async function toggleTask(agentId, taskId) {
+    const d = await getData();
+    const agent = d.agents.find(function(a) { return a.id === agentId; });
+    if (!agent) return;
+    if (!agent.progress) agent.progress = {};
+    agent.progress[taskId] = !agent.progress[taskId];
+    renderAgent(agentId); // Optimistic re-render
+    saveData(d);           // Save in background
+}
+
+// ══════════════════════════════════════════════
+// ADMIN
+// ══════════════════════════════════════════════
+let _adminLoggedIn = false;
+
+function showAdminGate() { showView('admin'); }
+
+async function renderAdminView() {
+    if (_adminLoggedIn) {
+        document.getElementById('adminLoginSection').style.display = 'none';
+        document.getElementById('adminPanelSection').style.display = 'block';
+        await Promise.all([renderAdminAgents(), renderCLEditor('new'), renderCLEditor('experienced')]);
+    } else {
+        document.getElementById('adminLoginSection').style.display = 'block';
+        document.getElementById('adminPanelSection').style.display = 'none';
+        document.getElementById('adminPwInput').value = '';
+        document.getElementById('loginError').style.display = 'none';
+        setTimeout(function() { document.getElementById('adminPwInput').focus(); }, 100);
+    }
+}
+
+async function adminLogin() {
+    const d = await getData();
+    const pw = document.getElementById('adminPwInput').value;
+    if (pw === d.adminPassword) {
+        _adminLoggedIn = true;
+        document.getElementById('loginError').style.display = 'none';
+        await renderAdminView();
+    } else {
+        document.getElementById('loginError').style.display = 'block';
+        document.getElementById('adminPwInput').select();
+    }
+}
+
+function adminLogout() { _adminLoggedIn = false; showView('home'); }
+
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.tab === tabName); });
+    document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+    document.getElementById('tab-' + tabName).classList.add('active');
+}
+
+async function renderAdminAgents() {
+    const d = await getData();
+    const agents = d.agents || [];
+    const tbl = document.getElementById('agentsTable');
+    if (!agents.length) {
+        tbl.innerHTML = '<div class="empty-state" style="border:none;border-radius:var(--radius)"><div class="empty-icon">👥</div><h3>No agents yet</h3><p>Click "Add Agent" to get started.</p></div>';
+        return;
+    }
+    var html = '<div class="dt-head"><div>Name</div><div>Type</div><div>Start Date</div><div>Progress</div><div style="text-align:right">Actions</div></div>';
+    agents.forEach(function(a) {
+        const p = getProgress(a, d.checklists);
+        const avCls = a.type === 'new' ? 'av-new' : 'av-exp';
+        const bdg = a.type === 'new' ? '<span class="badge badge-new">New Agent</span>' : '<span class="badge badge-exp">Experienced Agent</span>';
+        const fc = fillClass(a, p.pct);
+        html +=
+            '<div class="dt-row">' +
+                '<div class="name-cell">' +
+                    '<div class="avatar avatar-sm ' + avCls + '">' + esc(initials(a.name)) + '</div>' +
+                    '<div class="name-cell-text"><strong>' + esc(a.name) + '</strong></div>' +
+                '</div>' +
+                '<div>' + bdg + '</div>' +
+                '<div style="font-size:0.84rem;color:var(--text-muted)">' + fmtDate(a.startDate) + '</div>' +
+                '<div>' +
+                    '<div style="display:flex;align-items:center;gap:0.6rem;">' +
+                        '<div class="progress-bar" style="flex:1;height:6px;"><div class="progress-fill ' + fc + '" style="width:' + p.pct + '%"></div></div>' +
+                        '<span style="font-size:0.76rem;font-weight:700;color:var(--text-muted);min-width:34px;text-align:right">' + p.pct + '%</span>' +
+                    '</div>' +
+                    '<div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.2rem">' + p.done + '/' + p.total + ' tasks</div>' +
+                '</div>' +
+                '<div class="row-actions">' +
+                    '<button class="btn btn-ghost btn-xs" onclick="showView(\'agent\',\'' + a.id + '\')">View</button>' +
+                    '<button class="btn btn-ghost btn-xs" onclick="openEditAgentModal(\'' + a.id + '\')">Edit</button>' +
+                    '<button class="btn btn-ghost btn-xs" style="color:var(--danger)" onclick="confirmDeleteAgent(\'' + a.id + '\')">Delete</button>' +
+                '</div>' +
+            '</div>';
+    });
+    tbl.innerHTML = html;
+}
+
+async function renderCLEditor(type) {
+    const d = await getData();
+    const items = d.checklists[type] || [];
+    const el = document.getElementById(type === 'new' ? 'newCLEditor' : 'expCLEditor');
+    if (!items.length) {
+        el.innerHTML = '<div class="empty-state" style="border:none"><div class="empty-icon">📋</div><h3>No items yet</h3><p>Add checklist items to get started.</p></div>';
+        return;
+    }
+    var html = '<div class="cle-head"><div>Task</div><div>Description</div><div>When</div><div style="text-align:right">Actions</div></div>';
+    items.forEach(function(item) {
+        html +=
+            '<div class="cle-row">' +
+                '<div><div class="cle-title">' + esc(item.title) + '</div></div>' +
+                '<div><div class="cle-desc">' + esc(item.description || '') + '</div></div>' +
+                '<div style="font-size:0.82rem;color:var(--text-muted)">' + esc(item.day || '') + '</div>' +
+                '<div class="row-actions">' +
+                    '<button class="btn btn-ghost btn-xs" onclick="openEditItemModal(\'' + type + '\',\'' + item.id + '\')">Edit</button>' +
+                    '<button class="btn btn-ghost btn-xs" style="color:var(--danger)" onclick="confirmDeleteItem(\'' + type + '\',\'' + item.id + '\')">✕</button>' +
+                '</div>' +
+            '</div>';
+    });
+    el.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════
+// AGENT CRUD
+// ══════════════════════════════════════════════
+let _selType = 'new';
+
+function selectAgentType(t) {
+    _selType = t;
+    document.getElementById('agentTypeInput').value = t;
+    document.getElementById('typeOptNew').className = 'type-opt' + (t === 'new' ? ' sel-new' : '');
+    document.getElementById('typeOptExp').className = 'type-opt' + (t === 'experienced' ? ' sel-exp' : '');
+}
+
+function openAddAgentModal() {
+    document.getElementById('modalAgentTitle').textContent = 'Add Agent';
+    document.getElementById('editAgentId').value = '';
+    document.getElementById('agentNameInput').value = '';
+    document.getElementById('agentStartDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('editAgentExtra').style.display = 'none';
+    selectAgentType('new');
+    openModal('modalAgent');
+    setTimeout(function() { document.getElementById('agentNameInput').focus(); }, 120);
+}
+
+async function openEditAgentModal(id) {
+    const d = await getData();
+    const a = d.agents.find(function(x) { return x.id === id; });
+    if (!a) return;
+    document.getElementById('modalAgentTitle').textContent = 'Edit Agent';
+    document.getElementById('editAgentId').value = id;
+    document.getElementById('agentNameInput').value = a.name;
+    document.getElementById('agentStartDate').value = a.startDate || '';
+    document.getElementById('editAgentExtra').style.display = 'block';
+    selectAgentType(a.type);
+    openModal('modalAgent');
+}
+
+async function saveAgent() {
+    const name = document.getElementById('agentNameInput').value.trim();
+    const type = document.getElementById('agentTypeInput').value;
+    const startDate = document.getElementById('agentStartDate').value;
+    const editId = document.getElementById('editAgentId').value;
+    if (!name) { showToast('Please enter a name'); return; }
+    const d = await getData();
+    if (editId) {
+        const a = d.agents.find(function(x) { return x.id === editId; });
+        if (a) { a.name = name; a.type = type; a.startDate = startDate; }
+        showToast('Agent updated');
+    } else {
+        d.agents.push({ id: uid(), name: name, type: type, startDate: startDate, progress: {} });
+        showToast('Agent added');
+    }
+    await saveData(d);
+    closeModal('modalAgent');
+    await renderAdminAgents();
+}
+
+function confirmResetProgress() {
+    const id = document.getElementById('editAgentId').value;
+    getData().then(function(d) {
+        const a = d.agents.find(function(x) { return x.id === id; });
+        if (!a) return;
+        openConfirm('Reset Progress', 'Clear all checklist progress for "' + a.name + '"?', async function() {
+            const d2 = await getData();
+            const ag = d2.agents.find(function(x) { return x.id === id; });
+            if (ag) ag.progress = {};
+            await saveData(d2);
+            closeModal('modalAgent');
+            await renderAdminAgents();
+            showToast('Progress reset');
+        });
+    });
+}
+
+function confirmDeleteAgent(id) {
+    getData().then(function(d) {
+        const a = d.agents.find(function(x) { return x.id === id; });
+        if (!a) return;
+        openConfirm('Delete Agent', 'Delete "' + a.name + '"? Their progress will be permanently lost.', async function() {
+            const d2 = await getData();
+            d2.agents = d2.agents.filter(function(x) { return x.id !== id; });
+            await saveData(d2);
+            await renderAdminAgents();
+            showToast('Agent deleted');
+        });
+    });
+}
+
+// ══════════════════════════════════════════════
+// CHECKLIST ITEM CRUD
+// ══════════════════════════════════════════════
+function openAddItemModal(type) {
+    document.getElementById('modalItemTitle').textContent = 'Add Item — ' + (type === 'new' ? 'New' : 'Experienced') + ' Agent';
+    document.getElementById('editItemType').value = type;
+    document.getElementById('editItemId').value = '';
+    document.getElementById('itemTitleInput').value = '';
+    document.getElementById('itemDescInput').value = '';
+    document.getElementById('itemDayInput').value = '';
+    openModal('modalItem');
+    setTimeout(function() { document.getElementById('itemTitleInput').focus(); }, 120);
+}
+
+async function openEditItemModal(type, id) {
+    const d = await getData();
+    const item = (d.checklists[type] || []).find(function(i) { return i.id === id; });
+    if (!item) return;
+    document.getElementById('modalItemTitle').textContent = 'Edit Checklist Item';
+    document.getElementById('editItemType').value = type;
+    document.getElementById('editItemId').value = id;
+    document.getElementById('itemTitleInput').value = item.title;
+    document.getElementById('itemDescInput').value = item.description || '';
+    document.getElementById('itemDayInput').value = item.day || '';
+    openModal('modalItem');
+}
+
+async function saveItem() {
+    const type = document.getElementById('editItemType').value;
+    const editId = document.getElementById('editItemId').value;
+    const title = document.getElementById('itemTitleInput').value.trim();
+    const description = document.getElementById('itemDescInput').value.trim();
+    const day = document.getElementById('itemDayInput').value.trim();
+    if (!title) { showToast('Please enter a task title'); return; }
+    const d = await getData();
+    if (!d.checklists[type]) d.checklists[type] = [];
+    if (editId) {
+        const item = d.checklists[type].find(function(i) { return i.id === editId; });
+        if (item) { item.title = title; item.description = description; item.day = day; }
+        showToast('Item updated');
+    } else {
+        d.checklists[type].push({ id: uid(), title: title, description: description, day: day });
+        showToast('Item added');
+    }
+    await saveData(d);
+    closeModal('modalItem');
+    await renderCLEditor(type);
+}
+
+function confirmDeleteItem(type, id) {
+    getData().then(function(d) {
+        const item = (d.checklists[type] || []).find(function(i) { return i.id === id; });
+        if (!item) return;
+        openConfirm('Remove Item', 'Remove "' + item.title + '" from the checklist?', async function() {
+            const d2 = await getData();
+            d2.checklists[type] = (d2.checklists[type] || []).filter(function(i) { return i.id !== id; });
+            await saveData(d2);
+            await renderCLEditor(type);
+            showToast('Item removed');
+        });
+    });
+}
+
+// ══════════════════════════════════════════════
+// PASSWORD
+// ══════════════════════════════════════════════
+async function changePassword() {
+    const nv = document.getElementById('newPwInput').value;
+    const cv = document.getElementById('confirmPwInput').value;
+    const msg = document.getElementById('pwMsg');
+    if (!nv) { showMsg(msg, 'Please enter a new password.', false); return; }
+    if (nv !== cv) { showMsg(msg, 'Passwords do not match.', false); return; }
+    const d = await getData();
+    d.adminPassword = nv;
+    await saveData(d);
+    document.getElementById('newPwInput').value = '';
+    document.getElementById('confirmPwInput').value = '';
+    showMsg(msg, 'Password updated successfully!', true);
+    setTimeout(function() { msg.style.display = 'none'; }, 3000);
+}
+function showMsg(el, text, ok) {
+    el.textContent = text;
+    el.style.color = ok ? 'var(--success)' : 'var(--danger)';
+    el.style.display = 'block';
+}
+
+// ══════════════════════════════════════════════
+// MODALS & CONFIRM
+// ══════════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(function(o) {
+    o.addEventListener('click', function(e) { if (e.target === o) o.classList.remove('open'); });
+});
+
+let _confirmCb = null;
+function openConfirm(title, msg, cb) {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMsg').textContent = msg;
+    _confirmCb = cb;
+    document.getElementById('confirmOverlay').classList.add('open');
+}
+function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('open'); _confirmCb = null; }
+document.getElementById('confirmOkBtn').addEventListener('click', function() { if (_confirmCb) _confirmCb(); closeConfirm(); });
+document.getElementById('confirmOverlay').addEventListener('click', function(e) { if (e.target.id === 'confirmOverlay') closeConfirm(); });
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+renderHome();
+</script>
+</body>
+</html>
